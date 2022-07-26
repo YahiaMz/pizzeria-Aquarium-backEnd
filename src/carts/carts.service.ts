@@ -4,6 +4,7 @@ import { equal } from 'assert';
 import { identity } from 'rxjs';
 import { Food } from 'src/foods/entities/food.entity';
 import { FoodsService } from 'src/foods/foods.service';
+import { FoodSizeService } from 'src/food_size/food_size.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { MyExceptions } from 'src/Utils/MyExceptions';
@@ -18,9 +19,11 @@ export class CartsService {
     @InjectRepository(Cart) private cartRepository: Repository<Cart>,
     private userService: UsersService,
     private foodService: FoodsService,
+    private foodSizeService: FoodSizeService,
+
   ) {}
 
-  async isThisFoodExistInThisCart(user_Id: number, food_Id: number) {
+  async isThisFoodExistInThisCart(user_Id: number, food_Id: number , size_Id : number) {
     try {
     //  let item = await this.cartRepository.query(`SELECT * FROM cart c where c.user_Id = ${user.id} and c.food_Id = ${food.id} `);
     let item = await this.cartRepository.findOne({where : {
@@ -29,6 +32,9 @@ export class CartsService {
       } ,  
       food : {
         id : food_Id
+      },
+      foodSize: {
+        id : size_Id
       }
     }})  
     
@@ -50,8 +56,23 @@ export class CartsService {
       +addProductToCartDto.food_Id,
     );
 
+    let foodSize = null;
+    if(addProductToCartDto.size_Id != null) {
 
-  let item = await this.isThisFoodExistInThisCart(+user.id, +food.id);
+      foodSize = await this.foodSizeService.findSizeByIdOrThrowException(addProductToCartDto.size_Id);
+      if(foodSize && foodSize.food != addProductToCartDto.food_Id) {
+        MyExceptions.throwException('food size does not match this cart food item', null) ;    
+     }
+ 
+    }else {
+      if(food.price == null) {
+        MyExceptions.throwException('you have to select a size', null) ;     
+      }
+
+    }
+ 
+    
+  let item = await this.isThisFoodExistInThisCart(+user.id, +food.id ,addProductToCartDto.size_Id );
   
 
     try {
@@ -63,8 +84,9 @@ export class CartsService {
           );
         }
         item.quantity += +addProductToCartDto.quantity;
-        return await this.cartRepository.save(item);
-      } else {
+         await this.cartRepository.save(item);
+        return "item quantity changed"
+        } else {
         if (addProductToCartDto.quantity <= 0) {
           MyExceptions.throwException(
             'quantity must be positive to add new item to cart !',
@@ -74,9 +96,13 @@ export class CartsService {
         let newItem = this.cartRepository.create({
           food: food,
           user: user,
+          foodSize : foodSize,
           quantity: addProductToCartDto.quantity,
         });
-        return await this.cartRepository.save(newItem);
+        await this.cartRepository.save(newItem);
+      
+      return "item added"
+
       }
     } catch (error) {
       MyExceptions.throwException(
@@ -85,6 +111,7 @@ export class CartsService {
       );
     }
   }
+
 
   async findAllCartItemsOfUser(user_Id: number) {
     let mUser = await this.userService.findUserByIdOrThrowException(user_Id);
@@ -104,8 +131,19 @@ export class CartsService {
             imageUrl : true,
           }
         },
+        order :{
+          id : "ASC" ,
+          food : {
+            sizes : {
+              price : "ASC"
+            }
+          }
+        } ,
         relations:{
-          food : true , 
+          food : {
+            sizes : true , 
+          } , 
+          foodSize : true
         } ,
       });
       return cartItems;
@@ -113,6 +151,49 @@ export class CartsService {
       MyExceptions.throwException('something wrong !', error.message);
     }
   }
+
+
+
+  // this function is for increasing and decreasing quantity of cart item
+  async addThisQuantityToCartItem ( itemId : number , newQuantity : number ) {
+let cartItem = await this.findCartByIdOrThrowException(itemId  );
+
+if(cartItem.quantity+newQuantity <= 0) {
+  MyExceptions.throwException('wrong operation' , "you cant change quantity until <= 0");
+}
+
+ try {
+    cartItem.quantity += newQuantity;
+    return await this.cartRepository.save(cartItem);
+    
+ } catch (error) {
+  MyExceptions.throwException('something wrong while changing the quantity' , error.message);
+ }
+
+  }
+
+  async changeCartItemSize ( itemId : number , size_Id : number ) {
+    let cartItem = await this.findCartAndItFoodIdByIdOrThrowException(itemId)
+    let newSize = await this.foodSizeService.findSizeByIdOrThrowException(size_Id );
+    
+
+    console.log(cartItem);
+    console.log(newSize);
+    
+    
+    if(+cartItem.food !== +cartItem.food) {
+       MyExceptions.throwException('this food size is not a size of this food' , null)
+    }
+
+    try {
+        cartItem.foodSize = newSize;
+        return (await this.cartRepository.save(cartItem)).foodSize;
+        
+     } catch (error) {
+      MyExceptions.throwException('something wrong while changing the size' , error.message);
+     }
+    
+      }
 
 
   async findCartItemsToMakeOrder(user_Id: number) : Promise<Cart[]> {
@@ -167,6 +248,7 @@ export class CartsService {
         where: {
           id: cartItemId,
         },
+
       });
       if (cartItem) {
         return cartItem;
@@ -177,4 +259,26 @@ export class CartsService {
 
     MyExceptions.throwException('cart item not found !', null);
   }
+
+  public async findCartAndItFoodIdByIdOrThrowException(cartItemId: number) {
+    try {
+      let cartItem = await this.cartRepository.findOne({
+        where: {
+          id: cartItemId,
+        },
+        loadRelationIds : true  
+
+      });
+      if (cartItem) {
+        return cartItem;
+      }
+    } catch (error) {
+      MyExceptions.throwException('something wrong !', error.message);
+    }
+
+    MyExceptions.throwException('cart item not found !', null);
+  }
+
+  
+
 }

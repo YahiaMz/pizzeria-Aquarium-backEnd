@@ -1,4 +1,4 @@
-import { IsNumberString, IsPositive, Min, } from "class-validator";
+import { IsNumberString, IsOptional, IsPositive, Min, } from "class-validator";
 
 export class AddFoodToCartDto {
 
@@ -11,5 +11,8 @@ export class AddFoodToCartDto {
     @IsNumberString() 
     quantity : number;
     
+    @IsOptional()
+    @IsNumberString()
+    size_Id : number;
 
 }

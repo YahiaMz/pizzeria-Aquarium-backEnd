@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Category } from 'src/categories/entities/category.entity';
+import { FoodSize } from 'src/food_size/entities/food_size.entity';
 
 
 @Entity()
@@ -24,7 +26,7 @@ export class Food {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ type: 'integer', unsigned: true, nullable: false })
+  @Column({ type: 'integer', unsigned: true, nullable: true })
   price: number;
 
   @CreateDateColumn()
@@ -40,4 +42,9 @@ export class Food {
   })
   @JoinColumn({ referencedColumnName: 'id' , name : 'category_Id' })
   Category: Category;
+
+
+@OneToMany(_type => FoodSize , _size => _size.food , {nullable : true , onDelete : "CASCADE" , onUpdate : 'CASCADE'})
+sizes : FoodSize[];
+
 }

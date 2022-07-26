@@ -14,6 +14,8 @@ import { OrdersModule } from './orders/orders.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './order-items/entities/order-item.entity';
+import { FoodSizeModule } from './food_size/food_size.module';
+import { FoodSize } from './food_size/entities/food_size.entity';
 
 
 
@@ -41,12 +43,12 @@ const offlineLineDataBase = {
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'containers-us-west-79.railway.app',
-      port: 5528,
-      username: 'root',
-      password: 'oukG1Dy2UWoB4gtWgIOo',
-      database: 'railway',
-    entities: [Category , Food , User , Cart , Order , OrderItem],
+  host: 'localhost',
+  port: 3306,
+  username: 'Yahia',
+  password: 'AzerbB14916;',
+  database: 'pizzeria_aquarium_db',
+    entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize],
     synchronize: true,
   }),
     CategoriesModule,
@@ -54,7 +56,8 @@ const offlineLineDataBase = {
     UsersModule,
     CartsModule,
     OrdersModule,
-    OrderItemsModule,],
+    OrderItemsModule,
+    FoodSizeModule,],
   controllers: [AppController],
   providers: [AppService],
 })

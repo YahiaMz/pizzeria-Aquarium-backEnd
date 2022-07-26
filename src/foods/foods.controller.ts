@@ -3,7 +3,6 @@ import { FoodsService } from './foods.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MyExceptions } from 'src/Utils/MyExceptions';
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
 import { MyFilesHelper } from 'src/Utils/MyFilesHelper';
 import { join } from 'path';
@@ -16,11 +15,16 @@ export class FoodsController {
   @UseInterceptors(FileInterceptor('image'))
   async create(@Body() createFoodDto: CreateFoodDto , @UploadedFile() image : Express.Multer.File) {
 
-   if(!image) {
-    return ResponseStatus.failed_response('food image is required ' , null);
-   }
-   if(!MyFilesHelper.isOfTypePngOrJpeg(image.mimetype))
-   return ResponseStatus.failed_response('food image must be of type {.png or .jpeg} ' , null);
+    let foodHasCorrectPrice : boolean = (createFoodDto.price && createFoodDto.sizes == null) || (!createFoodDto.price && createFoodDto.sizes != null);
+    if(!foodHasCorrectPrice) {
+      return ResponseStatus.failed_response("you have to select price xor sizes" , "not error but bad input")
+    }
+
+  //  if(!image) {
+  //   return ResponseStatus.failed_response('food image is required ' , null);
+  //  }
+  //  if(!MyFilesHelper.isOfTypePngOrJpeg(image.mimetype))
+  //  return ResponseStatus.failed_response('food image must be of type {.png or .jpeg} ' , null);
 
     let newFood = await this.foodsService.create(createFoodDto , image);
     return ResponseStatus.success_response(newFood);
@@ -36,6 +40,9 @@ export class FoodsController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
   async update(@Param('id') id: string, @Body() updateFoodDto: UpdateFoodDto , image : Express.Multer.File) {
+    if(isNaN(+id)) {
+      return ResponseStatus.failed_response('id must be a positive integer')
+    }
     if(image && !MyFilesHelper.isOfTypePngOrJpeg(image.mimetype)) {
       return ResponseStatus.failed_response('image must be of type {.png  , .jpeg}')
     }
