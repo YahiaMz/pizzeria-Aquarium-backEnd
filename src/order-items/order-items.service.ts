@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Food } from 'src/foods/entities/food.entity';
+import { FoodSize } from 'src/food_size/entities/food_size.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Repository } from 'typeorm';
-import { CreateOrderItemDto } from './dto/create-order-item.dto';
-import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrderItem } from './entities/order-item.entity';
 
 @Injectable()
@@ -14,21 +13,22 @@ export class OrderItemsService {
 
   }
 
-  async create(order : Order , quantity : number , food : Food) : Promise<boolean> {
+  async create(order : Order , quantity : number , food : Food , foodSize : FoodSize , itemPrice : number) : Promise<boolean> {
     try {
-      let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food})
+      let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food , foodSize : foodSize , itemPrice : itemPrice})
       await this.orderItemRepository.save(newOrderItem);
       return true;
     } catch (error) {
       return false;
     }
 
+
   }
 
 
    createItem(order : Order , quantity : number , food : Food) {
     let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food})
-return newOrderItem;
+     return newOrderItem;
   }
 
 

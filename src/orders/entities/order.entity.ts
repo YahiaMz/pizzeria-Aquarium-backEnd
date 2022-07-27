@@ -26,6 +26,9 @@ export class Order {
     @OneToMany(_type => OrderItem , _item => _item.order )
     orderItems : OrderItem[];
 
+    @Column({type : "integer" , unsigned : true ,nullable : false , default : 100})
+    totalPrice : number;
+
     @CreateDateColumn()
     created_at : string;
  

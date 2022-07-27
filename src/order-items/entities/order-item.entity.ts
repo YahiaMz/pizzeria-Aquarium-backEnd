@@ -1,4 +1,5 @@
 import { Food } from "src/foods/entities/food.entity";
+import { FoodSize } from "src/food_size/entities/food_size.entity";
 import { Order } from "src/orders/entities/order.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
@@ -20,6 +21,11 @@ export class OrderItem {
     @JoinColumn({name : 'food_Id' , referencedColumnName : 'id'} ,)
     public food : Food;
 
+    @ManyToOne(_t => FoodSize , { nullable : true,onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )
+    @JoinColumn({name:'size_Id'})
+    public foodSize : FoodSize;
 
+    @Column({type : "int" , nullable : false , unsigned : true})
+    itemPrice : number;
 
 }

@@ -20,7 +20,7 @@ export class Cart {
     @JoinColumn({name : 'food_Id' , referencedColumnName : 'id'} ,)
     public food : Food;
 
-    @ManyToOne(_t => FoodSize , fs => fs.cart , {onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )
+    @ManyToOne(_t => FoodSize , fs => fs.cart , {nullable : true , onDelete : 'CASCADE' , onUpdate : 'CASCADE'} )
     @JoinColumn({name:'size_Id'})
     public foodSize : FoodSize;
 

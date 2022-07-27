@@ -38,7 +38,9 @@ export class OrdersService {
     );
     let cartItems = await this.cartService.findCartItemsToMakeOrder(user.id);
 
-    console.log(cartItems);
+if (cartItems.length == 0)
+      MyExceptions.throwException('you cant put this order !', 'empty cart');
+
 
     let newOrder = await this.createJustOrder(
       user,
@@ -53,35 +55,47 @@ export class OrdersService {
       );
     }
 
-    if (cartItems.length == 0)
-      MyExceptions.throwException('you cant put this order !', 'empty cart');
+    let newOrderWithTotalPrice = null;
 
     try {
+      let totalPrice : number = 0;
       for (let x = 0; x < cartItems.length; x++) {
         let cartItem = cartItems[x];
 
+        let orderItemPrice : number = cartItem.foodSize ? cartItem.foodSize.price : cartItem.food.price;
+        totalPrice += orderItemPrice * cartItem.quantity;
         let newOrderItem = await this.orderItemsService.create(
           newOrder,
           cartItem.quantity,
           cartItem.food,
+          cartItem.foodSize , 
+          orderItemPrice * cartItem.quantity
         );
         if (!newOrderItem) {
+          // removing the order if something wrong happen
           await this.orderRepository.remove(newOrder);
           return false;
         }
+
         await this.cartService.removeThiItem(cartItem);
       }
-
+      newOrder.totalPrice = totalPrice;
+       newOrderWithTotalPrice = await this.orderRepository.save(newOrder);
       return true;
     } catch (error) {
+      if(newOrderWithTotalPrice == null) {
+        await this.orderRepository.remove(newOrderWithTotalPrice);
+      }
       MyExceptions.throwException('please re-make your order !', error.message);
     }
   }
+
 
   async findAll() {
     try {
       let ordersForAdmin = await this.orderRepository.find({
         select: {
+          totalPrice:true ,
           id: true,
           address: true,
           phoneNumber: true,
@@ -97,17 +111,23 @@ export class OrdersService {
           orderItems: {
             id: true,
             quantity: true,
+            
+            foodSize : {
+              id : true , 
+              price : true ,
+              size : true
+            } ,
             food: {
               id: true,
               name: true,
               price: true,
-
               imageUrl: true,
             },
           },
         },
         relations: {
           orderItems: {
+            foodSize : true ,
             food: true,
           },
           user: true,
@@ -134,14 +154,15 @@ export class OrdersService {
           phoneNumber: true,
           created_at: true,
           status: true,
+          totalPrice : true ,
 
-          user: {
-            id: true,
-            name: true,
-            imageProfileUrl: true,
-            phoneNumber: true,
-          },
           orderItems: {
+            
+            foodSize : {
+              id :true , 
+              price :true , 
+              size :true ,
+            } ,
             id: true,
             quantity: true,
             food: {
@@ -156,6 +177,7 @@ export class OrdersService {
         relations: {
           orderItems: {
             food: true,
+            foodSize : true
           },
           user: true,
         },

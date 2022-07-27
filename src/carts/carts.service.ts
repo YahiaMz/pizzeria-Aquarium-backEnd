@@ -185,6 +185,10 @@ if(cartItem.quantity+newQuantity <= 0) {
        MyExceptions.throwException('this food size is not a size of this food' , null)
     }
 
+
+
+    
+
     try {
         cartItem.foodSize = newSize;
         return (await this.cartRepository.save(cartItem)).foodSize;
@@ -206,7 +210,8 @@ if(cartItem.quantity+newQuantity <= 0) {
         } , 
         relations:{
           food : true , 
-          user : true
+          user : true , 
+          foodSize : true
         } ,
       });
     
