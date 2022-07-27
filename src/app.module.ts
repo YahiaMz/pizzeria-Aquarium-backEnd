@@ -43,11 +43,11 @@ const offlineLineDataBase = {
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-  host: 'localhost',
-  port: 3306,
-  username: 'Yahia',
-  password: 'AzerbB14916;',
-  database: 'pizzeria_aquarium_db',
+      host: 'containers-us-west-79.railway.app',
+      port: 5528,
+      username: 'root',
+      password: 'oukG1Dy2UWoB4gtWgIOo',
+      database: 'railway',
     entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize],
     synchronize: true,
   }),
