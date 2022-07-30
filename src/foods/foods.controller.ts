@@ -20,19 +20,19 @@ export class FoodsController {
       return ResponseStatus.failed_response("you have to select price xor sizes" , "not error but bad input")
     }
 
-  //  if(!image) {
-  //   return ResponseStatus.failed_response('food image is required ' , null);
-  //  }
-  //  if(!MyFilesHelper.isOfTypePngOrJpeg(image.mimetype))
-  //  return ResponseStatus.failed_response('food image must be of type {.png or .jpeg} ' , null);
+   if(!image) {
+    return ResponseStatus.failed_response('food image is required ' , null);
+   }
+   if(!MyFilesHelper.isOfTypePngOrJpeg(image.mimetype))
+   return ResponseStatus.failed_response('food image must be of type {.png or .jpeg} ' , null);
 
     let newFood = await this.foodsService.create(createFoodDto , image);
     return ResponseStatus.success_response(newFood);
   }
 
-  @Get()
-   async findAll() {
-    let foods = await this.foodsService.findAll();
+  @Get('/:user_Id')
+   async findAll(@Param('user_Id') user_Id : string) {
+    let foods = await this.foodsService.findAll(+user_Id);
     return ResponseStatus.success_response(foods);
   }
 

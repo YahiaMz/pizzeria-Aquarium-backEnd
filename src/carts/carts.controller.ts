@@ -10,7 +10,7 @@ import {
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
 import { CartsService } from './carts.service';
 import { AddFoodToCartDto } from './dto/add-to-cart.dto';
-import { UpdateCartQuantityDto } from './dto/update-cart.dto';
+import { ChangeFoodInCartSizeDto } from './dto/change-cart-food-size.dto';
 
 @Controller('cart')
 export class CartsController {
@@ -56,27 +56,24 @@ export class CartsController {
     return ResponseStatus.success_response(updatedCartItem);
   }
 
-  @Patch('/:cartItemId/changeSizeTo/:size_Id')
+  @Patch('/:user_Id')
   async changeCartSize(
-    @Param('cartItemId') cartItemId: string,
-    @Param('size_Id') size_Id: string,
+    @Param('user_Id') user_Id: string,
+    @Body() changeFoodInCartSizeDto : ChangeFoodInCartSizeDto
   ) {
-    if (isNaN(+cartItemId)) {
+    if (isNaN(+user_Id)) {
       return ResponseStatus.failed_response(
-        'cartItemId must be an positive integer',
-      );
-    }
-
-    if (isNaN(+size_Id) && +size_Id == 0 ) {
-      return ResponseStatus.failed_response(
-        'size_Id must be an positive integer and not equals 0',
+        'user_Id must be an positive integer',
       );
     }
 
     let updatedCartItem = await this.cartsService.changeCartItemSize(
-      +cartItemId,
-      +size_Id,
+      +user_Id ,
+      +changeFoodInCartSizeDto.cartItem_Id,
+      +changeFoodInCartSizeDto.size_Id,
     );
+    console.log(updatedCartItem);
+    
     return ResponseStatus.success_response(updatedCartItem);
   }
 

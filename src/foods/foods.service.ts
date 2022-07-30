@@ -30,8 +30,8 @@ export class FoodsService {
 
   let savedNewFood = null;
     try {
-     // let file_name =  MyFilesHelper.saveFoodImage(image);
-      newFoodToCreate.imageUrl = "test image" + createFoodDto.name;
+      let file_name =  MyFilesHelper.saveFoodImage(image);
+      newFoodToCreate.imageUrl = file_name;
        savedNewFood =  await this.foodRepository.save(newFoodToCreate);
       if(createFoodDto.sizes && createFoodDto.sizes.length !=0 ) {
         createFoodDto.sizes.forEach(async _size => {
@@ -54,18 +54,26 @@ export class FoodsService {
 
   }
 
-  async findAll() {
+  async findAll(user_Id : number) {
        try {
         let foods = await this.foodRepository.find({
           relations : {
-            sizes : true
-          } , 
+            sizes : true , 
+            Category : true , 
+          }  ,
           order : {
             sizes : {
               price : "ASC"
             }
           }
         });
+
+          for(let x = 0 ; x < foods.length ; x ++) {
+          
+           let isLikedByThisUser = await this.foodRepository.query(`SELECT id from favourite f where f.user_Id = ${user_Id} and f.food_Id = ${foods[x].id} `)
+          foods[x]['isLiked'] = isLikedByThisUser.length > 0
+          }
+
         return foods;
        } catch (error) {
         MyExceptions.throwException('something wrong while fetching foods' , error.message)

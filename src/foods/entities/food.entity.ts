@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Category } from 'src/categories/entities/category.entity';
 import { FoodSize } from 'src/food_size/entities/food_size.entity';
+import { Favourite } from 'src/favourites/entities/favourite.entity';
 
 
 @Entity()
@@ -46,5 +47,8 @@ export class Food {
 
 @OneToMany(_type => FoodSize , _size => _size.food , {nullable : true , onDelete : "CASCADE" , onUpdate : 'CASCADE'})
 sizes : FoodSize[];
+
+@OneToMany(_type => Favourite , _mFavorite => _mFavorite.food ) 
+like : Favourite;
 
 }
