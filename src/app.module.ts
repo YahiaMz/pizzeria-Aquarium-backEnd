@@ -44,7 +44,7 @@ const offlineLineDataBase = {
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'mysql',
+  type: 'mysql',
   host: 'containers-us-west-79.railway.app',
   port: 5528,
   username: 'root',

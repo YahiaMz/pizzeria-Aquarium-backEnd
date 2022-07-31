@@ -72,7 +72,7 @@ export class UsersService {
       let user = await this.userRepository.findOne({
         where : {
         phoneNumber: phoneNumber,
-    } , relations : ['cartItems']});
+    } });
       if (user) {
         return user;
       }
