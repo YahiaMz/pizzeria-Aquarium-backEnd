@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, Logger } from '@nestjs/common';
 import { FoodsService } from './foods.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
@@ -15,9 +15,14 @@ export class FoodsController {
   @UseInterceptors(FileInterceptor('image'))
   async create(@Body() createFoodDto: CreateFoodDto , @UploadedFile() image : Express.Multer.File) {
 
-    let foodHasCorrectPrice : boolean = (createFoodDto.price && createFoodDto.sizes == null) || (!createFoodDto.price && createFoodDto.sizes != null);
+    let isThereAllThreePrices : boolean  = createFoodDto.small_Size_price != null && createFoodDto.medium_Size_price != null && createFoodDto.large_Size_price !=null; 
+    let isThereNoSizePrice : boolean = createFoodDto.small_Size_price == null && createFoodDto.medium_Size_price == null && createFoodDto.large_Size_price ==null; 
+
+    
+
+    let foodHasCorrectPrice : boolean = (createFoodDto.price !=null && isThereNoSizePrice) || (createFoodDto.price == null && isThereAllThreePrices );
     if(!foodHasCorrectPrice) {
-      return ResponseStatus.failed_response("you have to select price xor sizes" , "not error but bad input")
+      return ResponseStatus.failed_response("you have to select price xor all sizes prices" , "not error but bad input")
     }
 
    if(!image) {
@@ -27,7 +32,7 @@ export class FoodsController {
    return ResponseStatus.failed_response('food image must be of type {.png or .jpeg} ' , null);
 
     let newFood = await this.foodsService.create(createFoodDto , image);
-    return ResponseStatus.success_response(newFood);
+    return ResponseStatus.success_response("food created with success");
   }
 
   @Get('/:user_Id')
@@ -36,18 +41,36 @@ export class FoodsController {
     return ResponseStatus.success_response(foods);
   }
 
+  @Get('/')
+  async findAllForAdmin() {
+   let foods = await this.foodsService.findAllFoodsForAdmin();
+   return ResponseStatus.success_response(foods);
+ }
+
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
-  async update(@Param('id') id: string, @Body() updateFoodDto: UpdateFoodDto , image : Express.Multer.File) {
+  async update(@Param('id') id: string, @Body() updateFoodDto: UpdateFoodDto ,@UploadedFile() image : Express.Multer.File) {
     if(isNaN(+id)) {
       return ResponseStatus.failed_response('id must be a positive integer')
     }
+
     if(image && !MyFilesHelper.isOfTypePngOrJpeg(image.mimetype)) {
       return ResponseStatus.failed_response('image must be of type {.png  , .jpeg}')
     }
-   let updatedFood = await this.foodsService.update(+id, updateFoodDto , image);
-   return ResponseStatus.success_response(updatedFood);
+
+    let isThereAllThreePrices : boolean  = updateFoodDto.small_Size_price != null && updateFoodDto.medium_Size_price != null && updateFoodDto.large_Size_price !=null; 
+    let isThereNoSizePrice : boolean = updateFoodDto.small_Size_price == null && updateFoodDto.medium_Size_price == null && updateFoodDto.large_Size_price ==null; 
+    let foodHasCorrectPrice : boolean = (updateFoodDto.price !=null && isThereNoSizePrice) || (updateFoodDto.price == null && isThereAllThreePrices== true) || (isThereAllThreePrices == false && updateFoodDto.price==null) ;
+
+
+    if(!foodHasCorrectPrice) {
+      return ResponseStatus.failed_response("you have to select price xor all sizes prices" , "not error but bad input")
+    }
+
+
+ await this.foodsService.update(+id, updateFoodDto , image);
+   return ResponseStatus.success_response("UPDATED");
   }
 
   @Delete(':id')

@@ -18,12 +18,17 @@ export class CreateFoodDto {
     @IsOptional()
     price : number;
 
-    @IsOptional()
-    @IsArray()
-    @ArrayMinSize(3)
-    @ArrayMaxSize(3)
-    @ValidateNested({ each: true })
-    @Type(()=> CreateFoodSizeDto )
-    sizes : CreateFoodSizeDto[]
+   @IsNumberString()
+   @IsOptional()
+   small_Size_price : number
+
+   @IsNumberString()
+   @IsOptional()
+   medium_Size_price : number
+
+   @IsNumberString()
+   @IsOptional()
+   large_Size_price : number
+
 
 }

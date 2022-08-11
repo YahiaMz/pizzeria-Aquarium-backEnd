@@ -11,5 +11,8 @@ address  : string;
 @IsString()
 orderPhoneNumber : string;
 
+@IsString()
+area  : string;
+
 
 }

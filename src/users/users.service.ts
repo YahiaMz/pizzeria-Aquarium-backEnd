@@ -33,7 +33,7 @@ export class UsersService {
 
       return newUser;
     } catch (err) {
-      MyExceptions.throwException('phone number already exist', err.message);
+      MyExceptions.throwException('PHONE NUMBER EXIST', err.message);
     }
   }
 

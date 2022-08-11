@@ -14,6 +14,7 @@ export class MyFilesHelper {
  public static CATEGORY_IMAGES_PATH : string = "./uploads/categories/";
  public static FOOD_IMAGES_PATH : string = "./uploads/foods/";
  public static PROFILE_IMAGES_PATH : string = "./uploads/users/";
+ public static SLIDES_IMAGES_PATH : string = "./uploads/slides/"
 
   public static isOfTypePng(mMimetype) : boolean {
     let fileExtinction = mime.extension(mMimetype);
@@ -137,6 +138,8 @@ public static updateProfileImage( profileImage : Express.Multer.File , imageURl 
 }
 
 
+
+
 public static async removeProfileImage( profileImageUrl : string ) : Promise<boolean>{
   try {
       let file_path = this.PROFILE_IMAGES_PATH + profileImageUrl;
@@ -150,5 +153,47 @@ public static async removeProfileImage( profileImageUrl : string ) : Promise<boo
 
 
 // ---- end handling profile images
+
+
+
+
+ public  static  saveSlideImage( profileImage : Express.Multer.File ) : string{
+  let file_name = 'SLIDE_'+ uuidV4() + this.fileExtension(profileImage.mimetype);
+  let file_path = this.SLIDES_IMAGES_PATH + file_name;
+  let ws =  createWriteStream(file_path);
+  ws.write(profileImage.buffer);
+  return file_name;
+}
+
+public static updateSlideImage( profileImage : Express.Multer.File , imageURl : string ) : Boolean{
+    
+  try {
+      let file_path = this.SLIDES_IMAGES_PATH + imageURl;
+      let ws = createWriteStream(file_path);
+      ws.write(profileImage.buffer);        
+  } catch (error) {
+     MyExceptions.throwException("something wrong while updating image !" , error.message)
+  }
+
+  return true;
+}
+
+
+
+
+public static async removeSlideImage( profileImageUrl : string ) : Promise<boolean>{
+  try {
+      let file_path = this.SLIDES_IMAGES_PATH + profileImageUrl;
+     await fs.unlinkSync(file_path);
+  } catch (error) {
+      return false;
+  }
+  return true;
+}
+
+
+// ---- end handling profile images
+
+
 
 }

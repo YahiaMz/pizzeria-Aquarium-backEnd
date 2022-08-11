@@ -15,15 +15,16 @@ export class CategoriesController {
   @UseInterceptors(FileInterceptor("image"))
   async create(@Body() createCategoryDto: CreateCategoryDto , @UploadedFile() image : Express.Multer.File) {
     if(!image) {
-      return ResponseStatus.failed_response("image is required");
+      return ResponseStatus.failed_response("IMAGE_IS_REQUIRED");
     }
+   console.log(image)
 
-    if(!MyFilesHelper.isOfTypePng(image.mimetype)) {
-      return ResponseStatus.failed_response("image must be of type .png");
+   if(!MyFilesHelper.isOfTypePng(image.mimetype)) {
+      return ResponseStatus.failed_response("IMAGE_MUST_OF_TYPE_PNG");
     }
 
     let newCategory = await this.categoriesService.create(createCategoryDto , image);
-    return ResponseStatus.success_response(newCategory);
+    return ResponseStatus.success_response("CREATED");
   }
 
   @Get()
@@ -38,14 +39,14 @@ export class CategoriesController {
   async update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto , @UploadedFile() image : Express.Multer.File) {
     
     if(image && !MyFilesHelper.isOfTypePng(image.mimetype)) {
-      return ResponseStatus.failed_response('image must of type .png' , null);
+      return ResponseStatus.failed_response('IMAGE_MUST_OF_TYPE_PNG' , null);
     }
 
     if(isNaN(+id)) {
       return ResponseStatus.failed_response('enter a valid id' , "id must be a positive integer");
     }
     let updatedCategory = await this.categoriesService.update(+id, updateCategoryDto , image);
-    return ResponseStatus.success_response(updatedCategory);
+    return ResponseStatus.success_response("Category updated with success");
   }
 
   @Delete(':id')

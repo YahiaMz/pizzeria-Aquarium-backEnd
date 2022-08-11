@@ -38,7 +38,7 @@ export class CategoriesService {
          MyFilesHelper.RemoveCategoryImage(newCategory.imageUrl)
       }
 
-      MyExceptions.throwException('duplicate category name', error.message);
+      MyExceptions.throwException('DUPLICATE_NAME', error.message);
     }
 
     return 'This action adds a new category';
@@ -59,10 +59,11 @@ export class CategoriesService {
      
      if(image) MyFilesHelper.updateCategoryImage(image, categoryToUpdate.imageUrl);
       try {
-      return await this.categoryRepository.save(categoryToUpdate);
+       await this.categoryRepository.save(categoryToUpdate);
+       return ;
       } catch (error) {
         
-        MyExceptions.throwException("something wrong while updating category" , error.message);
+        MyExceptions.throwException("DUPLICATE_NAME" , error.message);
       }
     
   }

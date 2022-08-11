@@ -16,10 +16,16 @@ export class FoodSizeService {
 
   async create(food : Food , size : string , price : number) : Promise<FoodSize> {
       try {
+        console.log(food);
+        console.log(size);
+        console.log(price);
+        
         let newFoodSize =  this.foodSizeRepo.create({food : food , size : size , price : price});
         return  await this.foodSizeRepo.save(newFoodSize);
     
       } catch (error) {
+        console.log(error.message);
+        
         MyExceptions.throwException('something wrong while create food size ' , error.message)
       }
   }
@@ -38,8 +44,18 @@ export class FoodSizeService {
     
   }
 
-  update(id: number, updateFoodSizeDto: UpdateFoodSizeDto) {
-    return `This action updates a #${id} foodSize`;
+  async update(id: number, price  : number): Promise<Boolean> {
+  try {
+  let size = await this.foodSizeRepo.findOne({where : {id : id}});
+  if(size) {
+    size.price = price;
+    await this.foodSizeRepo.save(size);
+    return true;
+  }
+  } catch (error) {
+    return false;
+  }
+  return false
   }
 
  async remove(id: number)  {

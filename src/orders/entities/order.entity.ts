@@ -28,6 +28,9 @@ export class Order {
 
     @Column({type : "integer" , unsigned : true ,nullable : false , default : 100})
     totalPrice : number;
+    
+    @Column({type : 'varchar' , nullable : false  })
+    area : string;
 
     @CreateDateColumn()
     created_at : string;

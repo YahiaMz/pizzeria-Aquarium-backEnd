@@ -19,12 +19,13 @@ export class OrdersService {
     private usersService: UsersService,
   ) {}
 
-  async createJustOrder(user: User, address: string, phoneNumber: string) {
+  async createJustOrder(user: User, address: string, phoneNumber: string , area : string ) {
     try {
       let newOrder = this.orderRepository.create({
         user: user,
         address: address,
         phoneNumber: phoneNumber,
+        area : area
       });
       return await this.orderRepository.save(newOrder);
     } catch (error) {
@@ -46,6 +47,7 @@ if (cartItems.length == 0)
       user,
       createOrderDto.address,
       createOrderDto.orderPhoneNumber,
+      createOrderDto.area
     );
 
     if (newOrder == null) {
@@ -91,16 +93,102 @@ if (cartItems.length == 0)
   }
 
 
-  async findAll() {
+
+
+
+
+  async findAll( ) {
     try {
+
+
+    
       let ordersForAdmin = await this.orderRepository.find({
+        order : {
+          id : "DESC"
+        }, 
         select: {
+          
           totalPrice:true ,
           id: true,
           address: true,
           phoneNumber: true,
           created_at: true,
           status: true,
+          area : true ,
+
+          user: {
+            id: true,
+            name: true,
+            imageProfileUrl: true,
+            phoneNumber: true,
+          },
+          orderItems: {
+            id: true,
+            quantity: true,
+            
+            foodSize : {
+              id : true , 
+              price : true ,
+              size : true
+            } ,
+            food: {
+              id: true,
+              name: true,
+              price: true,
+              imageUrl: true,
+            },
+          },
+        },
+        relations: {
+          orderItems: {
+            foodSize : true ,
+            food: true,
+          },
+          user: true,
+        },
+      });
+
+
+    let ordersOfToday = [];
+    for (let x = 0 ; x < ordersForAdmin.length ; x++) {
+
+      let createdAtDate = new Date(ordersForAdmin[x].created_at)
+      let dateNow =new Date(Date.now());
+
+      if((createdAtDate.getFullYear() == dateNow.getFullYear()) && (createdAtDate.getUTCMonth() == dateNow.getUTCMonth()) && (createdAtDate.getUTCDay() == dateNow.getUTCDay() )) {
+        ordersOfToday.push(ordersForAdmin[x]);        
+      }
+
+    }
+
+
+      return ordersOfToday;
+    } catch (error) {
+      MyExceptions.throwException('something wrong !', error.message);
+    }
+  }
+
+
+
+  async findAllByPages(firstOrderId : number , pageNumber  : number) {
+    try {
+
+      if(pageNumber == 0) {
+
+      }
+      let ordersForAdmin = await this.orderRepository.find({
+        order : {
+          id : "DESC"
+        }, 
+        select: {
+          
+          totalPrice:true ,
+          id: true,
+          address: true,
+          phoneNumber: true,
+          created_at: true,
+          status: true,
+          area : true ,
 
           user: {
             id: true,
@@ -138,6 +226,7 @@ if (cartItems.length == 0)
       MyExceptions.throwException('something wrong !', error.message);
     }
   }
+
   async findAllOrdersOfUser(user_Id: number) {
     let user = await this.usersService.findUserByIdOrThrowException(user_Id);
 
@@ -155,6 +244,7 @@ if (cartItems.length == 0)
           id: true,
           address: true,
           phoneNumber: true,
+          area : true ,
           created_at: true,
           status: true,
           totalPrice : true ,
@@ -202,12 +292,11 @@ if (cartItems.length == 0)
     return  await this.orderRepository.save(order); 
     } catch (error) {
       MyExceptions.throwException('something wrong while updating status !', error.message);
+      console.log(error.message);
+      
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
-  }
 
   async findOrderByIdOrThrowException(order_Id: number): Promise<Order> {
     try {

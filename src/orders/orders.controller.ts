@@ -29,7 +29,7 @@ export class OrdersController {
         );
   }
 
-  @Get()
+  @Get("")
   async findAllOrders() {
     let orders = await this.ordersService.findAll();
     return ResponseStatus.success_response(orders);
@@ -42,12 +42,12 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() changeOrderStatusDto: ChangeTheOrderStatusDto) {
-    return this.ordersService.changeOrderStatus(+id, changeOrderStatusDto);
+  async update(@Param('id') id: string, @Body() changeOrderStatusDto: ChangeTheOrderStatusDto) {
+    await this.ordersService.changeOrderStatus(+id, changeOrderStatusDto);
+    return ResponseStatus.success_response(
+          'order status changed',
+        );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
-  }
+
 }
