@@ -5,10 +5,11 @@ import { OrderItemsService } from 'src/order-items/order-items.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { MyExceptions } from 'src/Utils/MyExceptions';
-import { Repository } from 'typeorm';
+import {  LessThan, Repository } from 'typeorm';
 import { ChangeTheOrderStatusDto } from './dto/change-order-status.dto';
 import { MakeOrderDto } from './dto/make-order.dto';
 import { Order } from './entities/order.entity';
+import { OrdersGateWay } from './orders.gateway';
 
 @Injectable()
 export class OrdersService {
@@ -17,6 +18,7 @@ export class OrdersService {
     private cartService: CartsService,
     private orderItemsService: OrderItemsService,
     private usersService: UsersService,
+    private ordersGateway : OrdersGateWay
   ) {}
 
   async createJustOrder(user: User, address: string, phoneNumber: string , area : string ) {
@@ -61,6 +63,7 @@ if (cartItems.length == 0)
 
     try {
       let totalPrice : number = 0;
+      let orderItems = []
       for (let x = 0; x < cartItems.length; x++) {
         let cartItem = cartItems[x];
 
@@ -73,6 +76,8 @@ if (cartItems.length == 0)
           cartItem.foodSize , 
           orderItemPrice * cartItem.quantity
         );
+        orderItems.push(newOrderItem);
+
         if (!newOrderItem) {
           // removing the order if something wrong happen
           await this.orderRepository.remove(newOrder);
@@ -81,9 +86,14 @@ if (cartItems.length == 0)
 
         await this.cartService.removeThiItem(cartItem);
       }
+      
       newOrder.totalPrice = totalPrice;
+  
        newOrderWithTotalPrice = await this.orderRepository.save(newOrder);
+       newOrderWithTotalPrice["items"] = orderItems;
+      this.ordersGateway.mServer.emit("new-order" , newOrderWithTotalPrice)
       return true;
+
     } catch (error) {
       if(newOrderWithTotalPrice == null) {
         await this.orderRepository.remove(newOrderWithTotalPrice);
@@ -170,69 +180,15 @@ if (cartItems.length == 0)
 
 
 
-  async findAllByPages(firstOrderId : number , pageNumber  : number) {
-    try {
 
-      if(pageNumber == 0) {
-
-      }
-      let ordersForAdmin = await this.orderRepository.find({
-        order : {
-          id : "DESC"
-        }, 
-        select: {
-          
-          totalPrice:true ,
-          id: true,
-          address: true,
-          phoneNumber: true,
-          created_at: true,
-          status: true,
-          area : true ,
-
-          user: {
-            id: true,
-            name: true,
-            imageProfileUrl: true,
-            phoneNumber: true,
-          },
-          orderItems: {
-            id: true,
-            quantity: true,
-            
-            foodSize : {
-              id : true , 
-              price : true ,
-              size : true
-            } ,
-            food: {
-              id: true,
-              name: true,
-              price: true,
-              imageUrl: true,
-            },
-          },
-        },
-        relations: {
-          orderItems: {
-            foodSize : true ,
-            food: true,
-          },
-          user: true,
-        },
-      });
-      return ordersForAdmin;
-    } catch (error) {
-      MyExceptions.throwException('something wrong !', error.message);
-    }
-  }
 
   async findAllOrdersOfUser(user_Id: number) {
     let user = await this.usersService.findUserByIdOrThrowException(user_Id);
 
     try {
-      let ordersForAdmin = await this.orderRepository.find({
+      let ordersOfUser = await this.orderRepository.find({
         where: {
+          status : LessThan(5) , 
           user: {
             id: user_Id,
           },
@@ -240,6 +196,8 @@ if (cartItems.length == 0)
         order : {
           id : 'DESC'
         },
+
+
         select: {
           id: true,
           address: true,
@@ -275,7 +233,22 @@ if (cartItems.length == 0)
           user: true,
         },
       });
-      return ordersForAdmin;
+
+      let ordersOfToday = [];
+      for (let x = 0 ; x < ordersOfUser.length ; x++) {
+  
+        let createdAtDate = new Date(ordersOfUser[x].created_at)
+        let dateNow =new Date(Date.now());
+  
+        let oneDayIn_ms = 3600000000 * 24 
+
+        if( dateNow.valueOf( ) - dateNow.valueOf( ) >=  oneDayIn_ms ) {
+          ordersOfToday.push(ordersOfUser[x]);        
+        }
+  
+      }
+
+      return ordersOfUser;
     } catch (error) {
       MyExceptions.throwException('something wrong !', error.message);
     }

@@ -24,7 +24,6 @@ import { SlidesModule } from './slides/slides.module';
 import { Slide } from './slides/entities/slide.entity';
 
 
-
 const onLineDataBase = {
   type: 'mysql',
   host: 'containers-us-west-79.railway.app',
@@ -48,12 +47,12 @@ const offlineLineDataBase = {
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-   type: 'mysql',
-  host: 'containers-us-west-79.railway.app',
-  port: 5528,
-  username: 'root',
-  password: 'oukG1Dy2UWoB4gtWgIOo',
-  database: 'railway',
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'Yahia',
+      password: 'AzerbB14916;',
+      database: 'pizzeria_aquarium_db',
     entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize , Favourite , Area , Slide],
     synchronize: true,
   }),
@@ -66,7 +65,8 @@ const offlineLineDataBase = {
     FoodSizeModule,
     FavouritesModule,
     AreasModule,
-    SlidesModule,],
+    SlidesModule,
+    ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -6,11 +6,12 @@ import { Order } from './entities/order.entity';
 import { OrderItemsModule } from 'src/order-items/order-items.module';
 import { CartsModule } from 'src/carts/carts.module';
 import { UsersModule } from 'src/users/users.module';
+import { OrdersGateWay } from './orders.gateway';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Order]) ,UsersModule , CartsModule , OrderItemsModule] , 
+  imports : [TypeOrmModule.forFeature([Order]) ,UsersModule , CartsModule , OrderItemsModule ] , 
   controllers: [OrdersController],
-  providers: [OrdersService ] , 
+  providers: [OrdersService  , OrdersGateWay] , 
   
 })
 export class OrdersModule {}

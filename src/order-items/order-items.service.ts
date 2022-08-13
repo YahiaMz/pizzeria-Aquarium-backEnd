@@ -13,11 +13,13 @@ export class OrderItemsService {
 
   }
 
-  async create(order : Order , quantity : number , food : Food , foodSize : FoodSize , itemPrice : number) : Promise<boolean> {
+  async create(order : Order , quantity : number , food : Food , foodSize : FoodSize , itemPrice : number) {
     try {
       let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food , foodSize : foodSize , itemPrice : itemPrice})
-      await this.orderItemRepository.save(newOrderItem);
-      return true;
+      let newItem =  await this.orderItemRepository.save(newOrderItem);
+      delete newOrderItem.order;
+      return newItem;
+    
     } catch (error) {
       return false;
     }
