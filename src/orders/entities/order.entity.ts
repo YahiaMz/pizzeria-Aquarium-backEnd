@@ -32,6 +32,9 @@ export class Order {
     @Column({type : 'varchar' , nullable : false  })
     area : string;
 
+    @Column({type : 'bool' , nullable : false , default : false})
+    isReceived : boolean
+
     @CreateDateColumn()
     created_at : string;
  

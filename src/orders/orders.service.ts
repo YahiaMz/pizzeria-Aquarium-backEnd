@@ -110,7 +110,9 @@ if (cartItems.length == 0)
   async findAll( ) {
     try {
 
+      let dateNow =new Date(Date.now());
 
+    
     
       let ordersForAdmin = await this.orderRepository.find({
         order : {
@@ -163,9 +165,11 @@ if (cartItems.length == 0)
     for (let x = 0 ; x < ordersForAdmin.length ; x++) {
 
       let createdAtDate = new Date(ordersForAdmin[x].created_at)
-      let dateNow =new Date(Date.now());
+      let dateNow = new Date(Date.now());
 
-      if((createdAtDate.getFullYear() == dateNow.getFullYear()) && (createdAtDate.getUTCMonth() == dateNow.getUTCMonth()) && (createdAtDate.getUTCDay() == dateNow.getUTCDay() )) {
+
+
+      if((dateNow.valueOf() - createdAtDate.valueOf()) <= 5 * 3600000 ) {
         ordersOfToday.push(ordersForAdmin[x]);        
       }
 
@@ -188,7 +192,6 @@ if (cartItems.length == 0)
     try {
       let ordersOfUser = await this.orderRepository.find({
         where: {
-          status : LessThan(5) , 
           user: {
             id: user_Id,
           },
@@ -205,6 +208,7 @@ if (cartItems.length == 0)
           area : true ,
           created_at: true,
           status: true,
+          isReceived : true ,
           totalPrice : true ,
 
           orderItems: {
@@ -239,16 +243,18 @@ if (cartItems.length == 0)
   
         let createdAtDate = new Date(ordersOfUser[x].created_at)
         let dateNow =new Date(Date.now());
-  
-        let oneDayIn_ms = 3600000000 * 24 
+      
 
-        if( dateNow.valueOf( ) - dateNow.valueOf( ) >=  oneDayIn_ms ) {
+        let oneDayIn_ms =   3600000 * 24;   
+
+        if( dateNow.valueOf( ) - createdAtDate.valueOf( ) <=  oneDayIn_ms ) {
+              
           ordersOfToday.push(ordersOfUser[x]);        
         }
   
       }
 
-      return ordersOfUser;
+      return ordersOfToday;
     } catch (error) {
       MyExceptions.throwException('something wrong !', error.message);
     }
@@ -270,6 +276,20 @@ if (cartItems.length == 0)
     }
   }
 
+
+  async OrderReceived(id: number) {
+    let order = await this.findOrderByIdOrThrowException(id);
+    try {
+      order.status = 4;
+      order.isReceived = true;
+      await this.orderRepository.save(order); 
+      return
+    } catch (error) {
+      MyExceptions.throwException('something wrong while updating status !', error.message);
+      console.log(error.message);
+      
+    }
+  }
 
   async findOrderByIdOrThrowException(order_Id: number): Promise<Order> {
     try {

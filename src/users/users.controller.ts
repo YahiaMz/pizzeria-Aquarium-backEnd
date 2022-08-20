@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
+import { JwtAuthGuard } from 'src/guards/jwt-guard';
 import { MyFilesHelper } from 'src/Utils/MyFilesHelper';
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
 import { SignUpUserDto } from './dto/sign-up.dto';
@@ -32,7 +33,7 @@ export class UsersController {
     return ResponseStatus.success_response(users);
   }
 
-
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   @UseInterceptors(FileInterceptor('image'))
   async updateUser (@Param('id') userId : string , @Body() updateDto : UpdateUserDto , @UploadedFile() profileImage : Express.Multer.File ) {
@@ -41,8 +42,8 @@ export class UsersController {
        return ResponseStatus.failed_response('image must be of type {.png , .jpeg ,}')
     }
 
-    let updatedUser = await this.usersService.update(+userId , updateDto , profileImage )
-    return ResponseStatus.success_response(updatedUser);
+   let imageUrl =   await this.usersService.update(+userId , updateDto , profileImage )
+    return ResponseStatus.success_response(imageUrl ? imageUrl : "UPDATED");
   }
 
 

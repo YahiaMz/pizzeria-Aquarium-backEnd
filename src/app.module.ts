@@ -43,16 +43,25 @@ const offlineLineDataBase = {
   database: 'pizzeria_aquarium_db',
 }
 
+const unVerifiedLineDataBase = {
+  type: 'mysql',
+  host: 'containers-us-west-78.railway.app',
+  port: 6422,
+  username: 'root',
+  password: 'pLSVP6pBgHzy9Wf7W76S',
+  database: 'railway',
+}
+
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-  host: 'containers-us-west-79.railway.app',
-  port: 5528,
-  username: 'root',
-  password: 'oukG1Dy2UWoB4gtWgIOo',
-  database: 'railway',
+      host: 'containers-us-west-78.railway.app',
+      port: 6422,
+      username: 'root',
+      password: 'pLSVP6pBgHzy9Wf7W76S',
+      database: 'railway',
     entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize , Favourite , Area , Slide],
     synchronize: true,
   }),

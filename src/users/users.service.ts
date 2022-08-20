@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { SignUpUserDto } from './dto/sign-up.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 import { MyExceptions } from 'src/Utils/MyExceptions';
 import { UserLoginDto } from './dto/user-login.dto';
 import { MyFilesHelper } from 'src/Utils/MyFilesHelper';
@@ -13,6 +14,8 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService
+
   ) {}
 
   saltOrRounds : number = 10;
@@ -28,9 +31,10 @@ export class UsersService {
         password: hashedPassword,
       });
       newUser = await this.userRepository.save(newUser);
-
       delete newUser.password;
 
+      let token = await this.jwtService.signAsync({id : newUser.id})
+      newUser["token"] = token;
       return newUser;
     } catch (err) {
       MyExceptions.throwException('PHONE NUMBER EXIST', err.message);
@@ -48,6 +52,10 @@ export class UsersService {
       );
       if (comparePasswordResult) {
         delete user.password;
+
+
+        let token = await this.jwtService.signAsync({id : user.id })
+        user["token"] = token;
         return user;
       }
     } catch (error) {
@@ -111,8 +119,11 @@ export class UsersService {
       Object.assign(user , updateUserDto);
  
       try {
-        return await this.userRepository.save(user);       
+         await this.userRepository.save(user);  
+         return user.imageProfileUrl;     
       } catch (error) {
+        console.log(error.message);
+        
         MyExceptions.throwException("phone number exist !" , error.message)
       }
 

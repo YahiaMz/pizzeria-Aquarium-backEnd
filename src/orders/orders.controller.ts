@@ -6,17 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Put,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { MakeOrderDto } from './dto/make-order.dto';
 import { ChangeTheOrderStatusDto, } from './dto/change-order-status.dto';
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
 import { userInfo } from 'os';
+import { JwtAuthGuard } from 'src/guards/jwt-guard';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createOrderDto: MakeOrderDto) {
     let newOrder = await this.ordersService.MakeOrder(createOrderDto);
@@ -35,6 +39,14 @@ export class OrdersController {
     return ResponseStatus.success_response(orders);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Put("/:order_Id/received")
+  async orderReceived(@Param("order_Id") orderId : string) {
+     await this.ordersService.OrderReceived(+orderId);
+    return ResponseStatus.success_response("RECEIVED");
+  }
+  
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     let orders = await this.ordersService.findAllOrdersOfUser(+id);
