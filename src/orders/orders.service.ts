@@ -91,14 +91,16 @@ if (cartItems.length == 0)
   
        newOrderWithTotalPrice = await this.orderRepository.save(newOrder);
        newOrderWithTotalPrice["items"] = orderItems;
-      this.ordersGateway.mServer.emit("new-order" , newOrderWithTotalPrice)
+       this.ordersGateway.mServer.emit("new-order" , newOrderWithTotalPrice)
+      
+      
       return true;
 
     } catch (error) {
       if(newOrderWithTotalPrice == null) {
         await this.orderRepository.remove(newOrderWithTotalPrice);
       }
-      MyExceptions.throwException('please re-make your order !', error.message);
+      MyExceptions.throwException('please re-place your order !', error.message);
     }
   }
 

@@ -32,9 +32,7 @@ export class FoodSizeService {
 
    async findSizeByIdOrThrowException(id: number) {
   try {
-    let foodSize = await this.foodSizeRepo.findOne({where : {id : id} , loadRelationIds : true});
-        console.log(foodSize);
-        
+    let foodSize = await this.foodSizeRepo.findOne({where : {id : id} , loadRelationIds : true});        
 
     if(foodSize) return foodSize;
   } catch (error) {

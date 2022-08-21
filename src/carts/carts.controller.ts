@@ -18,7 +18,7 @@ import { ChangeFoodInCartSizeDto } from './dto/change-cart-food-size.dto';
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() addFoodToCart: AddFoodToCartDto) {
     let newItem = await this.cartsService.addToCart(addFoodToCart);

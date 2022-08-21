@@ -15,20 +15,27 @@ import { ChangeTheOrderStatusDto, } from './dto/change-order-status.dto';
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
 import { userInfo } from 'os';
 import { JwtAuthGuard } from 'src/guards/jwt-guard';
+import { OrdersGateWay } from './orders.gateway';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService , private ordersGateWay : OrdersGateWay) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createOrderDto: MakeOrderDto) {
     let newOrder = await this.ordersService.MakeOrder(createOrderDto);
-    return newOrder
-      ? ResponseStatus.success_response(
+    
+    if(newOrder) { 
+      
+      
+      return ResponseStatus.success_response(
           'congratulation , order placed with success',
         )
-      : ResponseStatus.failed_response(
+      
+      }
+
+      else ResponseStatus.failed_response(
           'something wrong , please re-make your order !',
         );
   }
