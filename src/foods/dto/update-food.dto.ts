@@ -21,13 +21,13 @@ export class UpdateFoodDto {
 
    @IsNumberString()
    @IsOptional()
-   small_Size_price : number
+   small_size_price : number
 
    @IsNumberString()
    @IsOptional()
-   medium_Size_price : number
+   medium_size_price : number
 
    @IsNumberString()
    @IsOptional()
-   large_Size_price : number
+   large_size_price : number
 }

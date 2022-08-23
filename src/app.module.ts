@@ -26,10 +26,10 @@ import { Slide } from './slides/entities/slide.entity';
 
 const onLineDataBase = {
   type: 'mysql',
-  host: 'containers-us-west-57.railway.app',
-  port: 5833,
+  host: 'containers-us-west-79.railway.app',
+  port: 5528,
   username: 'root',
-  password: 'vIwyM5f9RVAb8aN4vG8G',
+  password: 'JE93Z9S9hK8STyEfUNR4',
   database: 'railway',
 }
 
@@ -55,13 +55,13 @@ const unVerifiedLineDataBase = {
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'containers-us-west-57.railway.app',
-      port: 5833,
-      username: 'root',
-      password: 'vIwyM5f9RVAb8aN4vG8G',
-      database: 'railway',
+  TypeOrmModule.forRoot({
+    type: 'mysql',
+    host: 'containers-us-west-79.railway.app',
+    port: 5528,
+    username: 'root',
+    password: 'JE93Z9S9hK8STyEfUNR4',
+    database: 'railway',
     entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize , Favourite , Area , Slide],
     synchronize: false,
   }),

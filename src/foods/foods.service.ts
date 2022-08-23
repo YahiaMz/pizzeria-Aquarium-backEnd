@@ -145,11 +145,16 @@ async updateFood ( food : Food , updateFoodDto : UpdateFoodDto , image : Express
 
 async updateFoodWithSizes ( food : Food , updateFoodDto : UpdateFoodDto , image : Express.Multer.File ) {
 
-    let smallSize = food.sizes.find(item => item.size === "small")
+
+  console.log(updateFoodDto);
+  
+
+
+  let smallSize = food.sizes.find(item => item.size === "small")
     let mediumSize =food.sizes.find(item => item.size === "medium")
     let largeSize = food.sizes.find(item => item.size === "large")
 
-    console.log(smallSize + " " + mediumSize + " " + largeSize);
+    console.log(smallSize.price + " " + mediumSize.price + " " + largeSize.price);
     
 
     if(!smallSize || !mediumSize || !largeSize) {
@@ -181,9 +186,11 @@ async updateFoodWithSizes ( food : Food , updateFoodDto : UpdateFoodDto , image 
     if(image) {
     MyFilesHelper.updateFoodImage(image , food.imageUrl);    
     }
-    let isSmallSizeUpdated = await this.foodSizeService.update(smallSize.id , updateFoodDto.small_Size_price );
-    let isMediumSizeUpdated = await this.foodSizeService.update(mediumSize.id , updateFoodDto.medium_Size_price );
-    let isLargeSizeUpdated = await this.foodSizeService.update(largeSize.id , updateFoodDto.large_Size_price );
+    let isSmallSizeUpdated = await this.foodSizeService.update(smallSize.id , updateFoodDto.small_size_price );
+    console.log(isSmallSizeUpdated);
+    
+    let isMediumSizeUpdated = await this.foodSizeService.update(mediumSize.id , updateFoodDto.medium_size_price );
+    let isLargeSizeUpdated = await this.foodSizeService.update(largeSize.id , updateFoodDto.large_size_price );
 
     return ;
   } catch (error) {
@@ -197,7 +204,8 @@ async updateFoodWithSizes ( food : Food , updateFoodDto : UpdateFoodDto , image 
   let foodToUpdate = await this.findFoodAndItSizesByIdOrThrowException(id);  
   
 
- if(updateFoodDto.small_Size_price != null) {
+
+ if(foodToUpdate.sizes.length != 0) {
   await this.updateFoodWithSizes(foodToUpdate , updateFoodDto ,image)
  } else {
    await this.updateFood(foodToUpdate , updateFoodDto , image)

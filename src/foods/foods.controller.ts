@@ -51,6 +51,10 @@ export class FoodsController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('image'))
   async update(@Param('id') id: string, @Body() updateFoodDto: UpdateFoodDto ,@UploadedFile() image : Express.Multer.File) {
+    
+    
+    
+
     if(isNaN(+id)) {
       return ResponseStatus.failed_response('id must be a positive integer')
     }
@@ -59,8 +63,8 @@ export class FoodsController {
       return ResponseStatus.failed_response('image must be of type {.png  , .jpeg}')
     }
 
-    let isThereAllThreePrices : boolean  = updateFoodDto.small_Size_price != null && updateFoodDto.medium_Size_price != null && updateFoodDto.large_Size_price !=null; 
-    let isThereNoSizePrice : boolean = updateFoodDto.small_Size_price == null && updateFoodDto.medium_Size_price == null && updateFoodDto.large_Size_price ==null; 
+    let isThereAllThreePrices : boolean  = updateFoodDto.small_size_price != null && updateFoodDto.medium_size_price != null && updateFoodDto.large_size_price !=null; 
+    let isThereNoSizePrice : boolean = updateFoodDto.small_size_price == null && updateFoodDto.medium_size_price == null && updateFoodDto.large_size_price ==null; 
     let foodHasCorrectPrice : boolean = (updateFoodDto.price !=null && isThereNoSizePrice) || (updateFoodDto.price == null && isThereAllThreePrices== true) || (isThereAllThreePrices == false && updateFoodDto.price==null) ;
 
 
