@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Put,
 } from '@nestjs/common';
@@ -13,29 +12,21 @@ import { OrdersService } from './orders.service';
 import { MakeOrderDto } from './dto/make-order.dto';
 import { ChangeTheOrderStatusDto, } from './dto/change-order-status.dto';
 import { ResponseStatus } from 'src/Utils/ResponseStatus';
-import { userInfo } from 'os';
 import { JwtAuthGuard } from 'src/guards/jwt-guard';
-import { OrdersGateWay } from './orders.gateway';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService , private ordersGateWay : OrdersGateWay) {}
+  constructor(private readonly ordersService: OrdersService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createOrderDto: MakeOrderDto) {
     let newOrder = await this.ordersService.MakeOrder(createOrderDto);
-    
-    if(newOrder) { 
-      
-      
-      return ResponseStatus.success_response(
+    return newOrder
+      ? ResponseStatus.success_response(
           'congratulation , order placed with success',
         )
-      
-      }
-
-      else ResponseStatus.failed_response(
+      : ResponseStatus.failed_response(
           'something wrong , please re-make your order !',
         );
   }

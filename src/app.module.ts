@@ -12,7 +12,7 @@ import { CartsModule } from './carts/carts.module';
 import { Cart } from './carts/entities/cart.entity';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemsModule } from './order-items/order-items.module';
-import { Order } from './orders/entities/order.entity';
+import { Orders } from './orders/entities/order.entity';
 import { OrderItem } from './order-items/entities/order-item.entity';
 import { FoodSizeModule } from './food_size/food_size.module';
 import { FoodSize } from './food_size/entities/food_size.entity';
@@ -23,16 +23,14 @@ import { Area } from './areas/entities/area.entity';
 import { SlidesModule } from './slides/slides.module';
 import { Slide } from './slides/entities/slide.entity';
 
-
 const onLineDataBase = {
   type: 'mysql',
-  host: 'containers-us-west-79.railway.app',
-  port: 5528,
+  host: 'containers-us-west-74.railway.app',
+  port: 6182,
   username: 'root',
-  password: 'JE93Z9S9hK8STyEfUNR4',
+  password: 'wSH9iOfkYeuBqGifPYFe',
   database: 'railway',
-}
-
+};
 
 const offlineLineDataBase = {
   type: 'mysql',
@@ -41,30 +39,31 @@ const offlineLineDataBase = {
   username: 'Yahia',
   password: 'AzerbB14916;',
   database: 'pizzeria_aquarium_db',
-}
-
-const unVerifiedLineDataBase = {
-  type: 'mysql',
-  host: 'containers-us-west-78.railway.app',
-  port: 6422,
-  username: 'root',
-  password: 'pLSVP6pBgHzy9Wf7W76S',
-  database: 'railway',
-}
-
+};
 
 @Module({
   imports: [
-  TypeOrmModule.forRoot({
-    type: 'mysql',
-    host: 'containers-us-west-79.railway.app',
-    port: 5528,
-    username: 'root',
-    password: 'JE93Z9S9hK8STyEfUNR4',
-    database: 'railway',
-    entities: [Category , Food , User , Cart , Order , OrderItem , FoodSize , Favourite , Area , Slide],
-    synchronize: false,
-  }),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'containers-us-west-74.railway.app',
+      port: 6182,
+      username: 'root',
+      password: 'wSH9iOfkYeuBqGifPYFe',
+      database: 'railway',
+      entities: [
+        Category,
+        Food,
+        User,
+        Cart,
+        Orders,
+        OrderItem,
+        FoodSize,
+        Favourite,
+        Area,
+        Slide,
+      ],
+      synchronize: false,
+    }),
     CategoriesModule,
     FoodsModule,
     UsersModule,
@@ -75,7 +74,7 @@ const unVerifiedLineDataBase = {
     FavouritesModule,
     AreasModule,
     SlidesModule,
-    ],
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

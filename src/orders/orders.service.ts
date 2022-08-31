@@ -8,13 +8,13 @@ import { MyExceptions } from 'src/Utils/MyExceptions';
 import {  LessThan, Repository } from 'typeorm';
 import { ChangeTheOrderStatusDto } from './dto/change-order-status.dto';
 import { MakeOrderDto } from './dto/make-order.dto';
-import { Order } from './entities/order.entity';
+import { Orders } from './entities/order.entity';
 import { OrdersGateWay } from './orders.gateway';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order) private orderRepository: Repository<Order>,
+    @InjectRepository(Orders) private orderRepository: Repository<Orders>,
     private cartService: CartsService,
     private orderItemsService: OrderItemsService,
     private usersService: UsersService,
@@ -93,7 +93,9 @@ if (cartItems.length == 0)
        newOrderWithTotalPrice["items"] = orderItems;
        this.ordersGateway.mServer.emit("new-order" , newOrderWithTotalPrice)
       
-      
+       console.log(newOrderWithTotalPrice);
+       
+
       return true;
 
     } catch (error) {
@@ -133,6 +135,7 @@ if (cartItems.length == 0)
           user: {
             id: true,
             name: true,
+            lastName : true ,
             imageProfileUrl: true,
             phoneNumber: true,
           },
@@ -207,6 +210,7 @@ if (cartItems.length == 0)
           id: true,
           address: true,
           phoneNumber: true,
+        
           area : true ,
           created_at: true,
           status: true,
@@ -293,7 +297,7 @@ if (cartItems.length == 0)
     }
   }
 
-  async findOrderByIdOrThrowException(order_Id: number): Promise<Order> {
+  async findOrderByIdOrThrowException(order_Id: number): Promise<Orders> {
     try {
       let order = await this.orderRepository.findOne({
         where: { id: order_Id },

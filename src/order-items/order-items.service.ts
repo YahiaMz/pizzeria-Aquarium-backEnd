@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Food } from 'src/foods/entities/food.entity';
 import { FoodSize } from 'src/food_size/entities/food_size.entity';
-import { Order } from 'src/orders/entities/order.entity';
+import { Orders } from 'src/orders/entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 
@@ -13,7 +13,7 @@ export class OrderItemsService {
 
   }
 
-  async create(order : Order , quantity : number , food : Food , foodSize : FoodSize , itemPrice : number) {
+  async create(order : Orders , quantity : number , food : Food , foodSize : FoodSize , itemPrice : number) {
     try {
       let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food , foodSize : foodSize , itemPrice : itemPrice})
       let newItem =  await this.orderItemRepository.save(newOrderItem);
@@ -28,7 +28,7 @@ export class OrderItemsService {
   }
 
 
-   createItem(order : Order , quantity : number , food : Food) {
+   createItem(order : Orders , quantity : number , food : Food) {
     let newOrderItem = this.orderItemRepository.create({order : order , quantity : quantity , food : food})
      return newOrderItem;
   }

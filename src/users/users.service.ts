@@ -67,7 +67,7 @@ export class UsersService {
 
   async findAll() {
     try {
-      let users = await this.userRepository.find({select : ['id' , "name" , "imageProfileUrl" , "phoneNumber" , "created_at"]});
+      let users = await this.userRepository.find({select : ['id' , "name" , "imageProfileUrl" , "phoneNumber" , "created_at" , "lastName"]});
       return users;
       } catch (error) {
         MyExceptions.throwException('something wrong while fetching users', error.message); 
